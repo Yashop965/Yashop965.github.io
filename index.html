@@ -157,6 +157,25 @@ footer a:hover{text-decoration:underline}
 .demo-meta b{color:#7ee787;font-weight:600}
 @media(max-width:860px){.demo{grid-template-columns:1fr}.demo-panel{min-height:0}}
 
+
+/* ===== v4: bigger stages, HUD, pause, cursor, scan effects ===== */
+.demo-panel{min-height:480px}
+.demo-panel .stage{min-height:340px}
+.hud{position:absolute;top:10px;left:12px;font:11px/1.6 ui-monospace,Consolas,monospace;color:#8b98ab;z-index:4;pointer-events:none}
+.hud b{color:#7ee787;font-weight:600}
+.demo-pp{position:absolute;top:10px;right:10px;z-index:5;background:rgba(10,15,22,.85);border:1px solid #22304a;color:#8b98ab;font:11px ui-monospace,Consolas,monospace;border-radius:8px;padding:5px 10px;cursor:pointer;transition:all .15s}
+.demo-pp:hover{color:#56d8dd;border-color:#56d8dd}
+.cur{display:inline-block;width:7px;height:12px;background:#56d8dd;margin-left:2px;animation:blink 1s steps(1) infinite;vertical-align:-2px}
+@keyframes blink{50%{opacity:0}}
+.scanline{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.02) 3px 4px);pointer-events:none;z-index:1}
+.fb-body{position:relative}
+.scanbar{position:absolute;top:-6px;bottom:-6px;left:0;width:26px;background:linear-gradient(90deg,transparent,rgba(255,123,114,.4),transparent);display:none;z-index:3}
+.pii.scanning{animation:piipulse .9s ease-in-out}
+@keyframes piipulse{50%{background:rgba(255,123,114,.18)}}
+.resrow{display:flex;gap:8px;font-size:.66rem;color:#5b6675;margin-top:8px;align-items:center}
+.resrow .src{width:14px;height:14px;border:1px solid #22304a;border-radius:3px;background:#16202e;flex:none}
+.sb{display:flex;justify-content:space-between;font-size:.56rem;color:#5b6675;padding:0 6px 6px;font-family:ui-monospace,Consolas,monospace}
+#gurtai-out{background:transparent;padding:0;max-width:100%;display:flex;flex-direction:column;gap:7px}
 </style>
 </head>
 <body>
@@ -292,8 +311,8 @@ footer a:hover{text-decoration:underline}
         <p>Live gait cycle: 4 legs, 2 joints each, trot pattern at 1.1 Hz. The terminal mirrors the serial monitor — servo PWM allocation and the incident-fixed 5A buck holding under 8-servo load.</p>
         <a class="repo" href="https://github.com/Yashop965/sesame-robot" target="_blank">sesame-robot <span class="repopill">open source</span></a>
       </div>
-      <div class="demo-panel">
-        <div class="stage"><canvas id="cv-quad"></canvas><div class="glow"></div></div>
+      <div class="demo-panel"><button class="demo-pp">❚❚ pause</button>
+        <div class="stage"><canvas id="cv-quad"></canvas><div class="glow"></div><div class="scanline"></div><div class="hud" id="hud-quad"></div></div>
         <div class="term">
           <div class="term-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="ttl">esp32 · serial monitor · 115200</span></div>
           <pre id="term-quad"></pre>
@@ -309,8 +328,8 @@ footer a:hover{text-decoration:underline}
         <p>Top-down: the mother drone scores each sub-drone (battery, proximity, payload) and delegates tasks; subs reposition between waypoints. Router log streams the assignments — 4/4 validated in Gazebo.</p>
         <a class="repo" href="https://github.com/Yashop965" target="_blank">ROS2 Humble + Gazebo <span class="repopill">sim workspace</span></a>
       </div>
-      <div class="demo-panel">
-        <div class="stage"><canvas id="cv-swarm"></canvas><div class="glow"></div></div>
+      <div class="demo-panel"><button class="demo-pp">❚❚ pause</button>
+        <div class="stage"><canvas id="cv-swarm"></canvas><div class="glow"></div><div class="scanline"></div><div class="hud" id="hud-swarm"></div></div>
         <div class="term">
           <div class="term-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="ttl">ros2 · task_router · /swarm/assign</span></div>
           <pre id="term-swarm"></pre>
@@ -335,6 +354,9 @@ footer a:hover{text-decoration:underline}
               <div class="pii" id="sih-pii">A. Sharma &amp; co.</div>
               <div class="lbl" style="margin-top:10px">Abstract (PII-safe)</div>
               <div id="sih-abs" style="font-size:.72rem;color:#9fb2c8;min-height:24px">“…we demonstrate autonomous docking of up to 6 sub-drones…”</div>
+              <div class="resrow"><span class="src"></span><span>papers.example.org &middot; swarm docking &middot; 2026</span></div>
+              <div class="resrow"><span class="src"></span><span>arxiv-mirror &middot; carrier multi-rotor &middot; preprint</span></div>
+              <div class="scanbar" id="sih-scan"></div>
             </div>
           </div>
           <div class="demo-meta"><span>PII bytes leaked <b>0</b></span><span>redactions <b id="sih-rdx">1</b></span><span>client-side only <b>✓</b></span></div>
@@ -358,6 +380,7 @@ footer a:hover{text-decoration:underline}
         <div class="phone-wrap">
           <div class="phone">
             <div class="notch"></div>
+            <div class="sb"><span>14:32</span><span>▲42 · 5G · ▮78%</span></div>
             <div class="app"><span>Telegram</span><span>● Gurtai <i style="color:#7ee787">local</i></span></div>
             <div class="chat">
               <div class="msg user">summarize the gurtai repo</div>
@@ -471,264 +494,389 @@ footer a:hover{text-decoration:underline}
 </script>
 
 <script>
-/* ================= LIVE DEMO ENGINES ================= */
+/* ================= LIVE DEMO ENGINES v4 ================= */
 (function(){
+  "use strict";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var $ = function(id){ return document.getElementById(id); };
+  function $(id){ return document.getElementById(id); }
 
-  /* ---------- terminal typing engine ---------- */
-  function makeTerm(el, lines, holdFrames){
-    var li = 0, ci = 0, out = [], frame = 0;
-    function render(){
-      out = out.slice(-7);
-      el.innerHTML = out.map(function(l){ return l.cls ? '<span class="'+l.cls+'">'+esc(l.text)+'</span>' : esc(l.text); }).join("\n");
-    }
+  /* ---------------- typed terminal ---------------- */
+  function makeTerm(el, lines){
+    var li=0, ci=0, done=[], typing=null, holdUntil=0;
     function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
-    function step(){
-      frame++;
-      var line = lines[li];
-      if(ci < line.text.length){
-        // type 4 chars per frame
-        var take = line.text.slice(0, ci+4); ci += 4;
-        if(out.length === 7 || !out.length || out[out.length-1].wip){
-          out.push({text:take, cls:line.cls, wip:true});
-          if(out.length>7) out.shift();
-        } else {
-          out[out.length-1].text = take;
-        }
-        render();
-      } else {
-        if(out.length && out[out.length-1].wip) out[out.length-1].wip = false;
-        out.push({text:"", wip:true});
-        ci = 0; li = (li+1) % lines.length;
-        // hold at end of cycle
-        if(li === 0) holdFrames = frame + 90;
-        render();
-      }
-      return frame > holdFrames;
+    function render(){
+      var h = done.slice(-6).map(function(l){
+        return l.cls ? '<span class="'+l.cls+'">'+esc(l.text)+'</span>' : esc(l.text);
+      }).join("\n");
+      if(typing){ h += (h ? "\n" : "") + (typing.cls ? '<span class="'+typing.cls+'">'+esc(typing.text)+'</span>' : esc(typing.text)) + '<span class="cur"></span>'; }
+      el.innerHTML = h || '<span class="cur"></span>';
     }
-    return { step: step,
-             prime: function(){ out=[]; li=0; ci=0; frame=0; for(var i=0;i<Math.min(4,lines.length);i++){ out.push({text:lines[i].text, cls:lines[i].cls}); ci=0; } render(); } };
+    function step(){
+      if(!typing){
+        if(performance.now() < holdUntil){ render(); return; }
+        typing = { text:"", cls: lines[li].cls }; ci = 0;
+      }
+      var line = lines[li];
+      var n = Math.floor(Math.random()*3)+2; // 2-4 chars per frame
+      typing.text = line.text.slice(0, ci+n); ci += n;
+      if(ci >= line.text.length){
+        done.push({ text: line.text, cls: line.cls });
+        typing = null;
+        li = (li+1) % lines.length;
+        if(li === 0) holdUntil = performance.now() + 1400;
+      }
+      render();
+    }
+    return { step: step, prime: function(){ done=[]; for(var i=0;i<Math.min(5,lines.length);i++) done.push(lines[i]); typing=null; render(); } };
   }
 
-  /* ---------- canvas helper ---------- */
+  /* ---------------- canvas helpers ---------------- */
   function fit(cv){
     var r = cv.parentElement.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    cv.width = r.width * dpr; cv.height = r.height * dpr;
-    cv.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
-    return { w: r.width, h: r.height };
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(1, r.width*dpr); cv.height = Math.max(1, r.height*dpr);
+    var c = cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0);
+    return { w: r.width, h: r.height, ctx: c };
   }
-
-  /* ---------- 1 · sesame gait ---------- */
-  var quad = $("cv-quad");
-  var quadS = makeTerm($("term-quad"), [
-    {text:"boot ok · 8x MG90S detected · ECO limiter on (max 4 concurrent)"},
-    {text:"trot gait @ 1.1 Hz · phase offset 180°", cls:"cy"},
-    {text:"pwm: timer0=FL/FR timer1=BL/BR (50 Hz, 0.5–2.5 ms)", cls:"cy"},
-    {text:"buck: 2.1 A @ 5.02 V · thermal OK · 42 °C", cls:"ok"},
-    {text:"servo heat: FL 41° · BL 39° · ECO OK"},
-    {text:"wifi: AP sesame-ctrl · 3 clients · portal served", cls:"am"},
-    {text:"rest /api/status → {gait:trot, v:0.4 m/s, batt:7.9 V}"},
-  ], 0);
-  function drawQuad(t){
-    var s = fit(quad), ctx = quad.getContext("2d");
-    ctx.clearRect(0,0,s.w,s.h);
-    var gy = s.h*0.78;
-    ctx.strokeStyle="#22304a"; ctx.lineWidth=1;
-    for(var x=0;x<s.w;x+=28){ ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x,gy+14); ctx.stroke(); }
-    ctx.strokeStyle="#3d4f68"; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(s.w,gy); ctx.stroke();
-    var cx = s.w/2, bodyY = gy - 62 + Math.sin(t*2.2)*3, bw = 150, bh = 30;
-    function leg(hx, ph, back){
-      var a1 = (-0.55 + Math.sin(t*2.2 + ph)*0.5);
-      var a2 = (-1.15 + Math.sin(t*2.2 + ph + 1.2)*0.55);
-      var L1=34, L2=30;
-      var kx = hx + Math.sin(a1)*L1, ky = bodyY + Math.cos(a1)*L1 + 8;
-      var fx = kx + Math.sin(a1+a2)*L2, fy = ky + Math.cos(a1+a2)*L2;
-      var lift = Math.max(0, Math.sin(t*2.2+ph+0.6))*6;
-      ctx.strokeStyle = back ? "#5b6f8c" : "#8fa8c8"; ctx.lineWidth = back?3:4; ctx.lineCap="round";
-      ctx.beginPath(); ctx.moveTo(hx, bodyY+8); ctx.lineTo(kx,ky); ctx.lineTo(fx,fy-lift); ctx.stroke();
-      ctx.fillStyle = back ? "#42536e" : "#6e87a8";
-      ctx.beginPath(); ctx.arc(hx, bodyY+8, back?3.5:4.5, 0, 7); ctx.fill();
-      ctx.beginPath(); ctx.arc(kx, ky, back?3:3.5, 0, 7); ctx.fill();
-      ctx.fillStyle = back ? "#5b6f8c" : "#c3d4e8";
-      ctx.beginPath(); ctx.ellipse(fx, fy-lift, 6, 2.5, 0, 0, 7); ctx.fill();
-    }
-    // back pair (drawn first, dimmer)
-    leg(cx-52, Math.PI, true); leg(cx+52, 0, true);
-    // body
-    ctx.fillStyle="#1d3557"; ctx.strokeStyle="#56d8dd"; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.roundRect(cx-bw/2, bodyY-bh/2, bw, bh, 8); ctx.fill(); ctx.stroke();
-    ctx.fillStyle="#7ee787"; ctx.beginPath(); ctx.arc(cx+bw/2-14, bodyY, 3, 0, 7); ctx.fill();
-    ctx.fillStyle="#9fb2c8"; ctx.font="10px ui-monospace,monospace"; ctx.fillText("ESP32 · SSD1306 status: WALK", cx-bw/2+10, bodyY-10);
-    // front pair
-    leg(cx-52, 0, false); leg(cx+52, Math.PI, false);
-    ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace";
-    ctx.fillText("trot @ 1.1 Hz", 14, 22);
-    ctx.fillStyle="#7ee787"; ctx.fillText("load: 2.1 A (5 A buck)", 14, 38);
-  }
-
-  /* ---------- 2 · swarm ---------- */
-  var swarm = $("cv-swarm");
-  var swarmS = makeTerm($("term-swarm"), [
-    {text:"task_router: new task → area_scan_3 (score: sub2 0.87 > sub4 0.79)"},
-    {text:"sub2 assigned · eta 14 s · battery 82% · dist 3.2 m", cls:"cy"},
-    {text:"mesh: 5 nodes · rssi -48 dBm · qos ok"},
-    {text:"task_router: task complete → sub1 docking (autonomous nav)", cls:"am"},
-    {text:"battery watchdog: sub4 41% < 45% → return-and-charge", cls:"am"},
-    {text:"task_router: sub4 swap-in queued (score 0.61)"},
-  ], 0);
-  var subs = [{x:0,y:0,tx:0,ty:0,v:0},{x:0,y:0,tx:0,ty:0,v:0},{x:0,y:0,tx:0,ty:0,v:0},{x:0,y:0,tx:0,ty:0,v:0}];
-  var swarmT = 0, taskTick = 0;
-  function drawSwarm(t){
-    var s = fit(swarm), ctx = swarm.getContext("2d");
-    ctx.clearRect(0,0,s.w,s.h);
-    var cx=s.w/2, cy=s.h/2;
-    // arena rings
-    ctx.strokeStyle="#1d2836";
-    [0.28,0.5,0.72].forEach(function(r){ ctx.beginPath(); ctx.arc(cx,cy,Math.min(s.w,s.h)/2*r*0.86,0,7); ctx.lineWidth=1; ctx.stroke(); });
-    // mother hex
-    var spin = t*0.4;
-    ctx.save(); ctx.translate(cx,cy); ctx.rotate(spin*0.15);
+  function hex(ctx,x,y,r,rot,fill,stroke,lw){
+    ctx.save(); ctx.translate(x,y); ctx.rotate(rot||0);
     ctx.beginPath();
-    for(var i=0;i<6;i++){ var a=i*Math.PI/3; ctx[i?"lineTo":"moveTo"](Math.cos(a)*16, Math.sin(a)*16); }
-    ctx.closePath(); ctx.fillStyle="#1d3557"; ctx.fill(); ctx.strokeStyle="#56d8dd"; ctx.lineWidth=2; ctx.stroke();
+    for(var i=0;i<6;i++){ var a=i*Math.PI/3; ctx[i?"lineTo":"moveTo"](Math.cos(a)*r, Math.sin(a)*r); }
+    ctx.closePath();
+    if(fill){ ctx.fillStyle=fill; ctx.fill(); }
+    if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=lw||1.5; ctx.stroke(); }
     ctx.restore();
-    ctx.fillStyle="#56d8dd"; ctx.font="10px ui-monospace,monospace"; ctx.fillText("MOTHER", cx-18, cy+34);
-    taskTick++;
-    if(taskTick > 260){ taskTick = 0;
-      var sub = subs[Math.floor(Math.random()*4)];
-      var a = Math.random()*7, rr = 50 + Math.random()*60;
-      sub.tx = cx + Math.cos(a)*rr*0.9; sub.ty = cy + Math.sin(a)*rr*0.9;
+  }
+
+  var pauses = {}; // per-demo play state
+
+  /* ================= 1 · SESAME QUADRUPED ================= */
+  var quadCv = $("cv-quad");
+  var quadT = makeTerm($("term-quad"), [
+    { text:"boot ok · 8x MG90S detected · ECO limiter on (max 4 concurrent)" },
+    { text:"trot gait @ 1.1 Hz · step 34 mm · clear 6 mm", cls:"cy" },
+    { text:"pwm: timer0=FL/FR timer1=BL/BR · 50 Hz · 0.5-2.5 ms", cls:"cy" },
+    { text:"buck: 2.14 A @ 5.02 V · thermal 42C · OK", cls:"ok" },
+    { text:"servo heat FL 41 / FR 40 / BL 39 / BR 39 - ECO clear" },
+    { text:"wifi AP sesame-ctrl · 3 clients · portal served", cls:"am" },
+    { text:"GET /api/status -> {gait:trot v:0.42 slip:0%}" },
+    { text:"POST /api/command {cmd:step} -> 200 in 38 ms" },
+  ]);
+
+  function legIK(hx,hy,fx,fy,L1,L2){
+    var dx=fx-hx, dy=fy-hy, d=Math.min(Math.hypot(dx,dy), L1+L2-0.01);
+    var a = Math.atan2(dy,dx);
+    var c = (L1*L1 + d*d - L2*L2) / (2*L1);
+    var ca = Math.max(-1, Math.min(1, c/L1));
+    var b = Math.acos(ca);
+    var kx = hx + Math.cos(a-b)*L1, ky = hy + Math.sin(a-b)*L1;
+    return {kx:kx, ky:ky};
+  }
+  function drawQuad(t, viewHud){
+    var s = fit(quadCv), ctx = s.ctx;
+    var W=s.w, H=s.h;
+    ctx.clearRect(0,0,W,H);
+    // grid floor
+    var gy = H*0.80;
+    ctx.strokeStyle="#151f2e"; ctx.lineWidth=1;
+    for(var gx=0; gx<W; gx+=34){ ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx - 18, H); ctx.stroke(); }
+    ctx.strokeStyle="#243247"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke();
+
+    var cx=W/2, bob=4*Math.abs(Math.sin(t*2.2+0.6)), bodyY = gy-84-bob;
+    var hipX=52, L1=40, L2=38, stepA=30, clear=9, omega=2.2;
+    // shadow
+    ctx.fillStyle="rgba(0,0,0,0.35)";
+    ctx.beginPath(); ctx.ellipse(cx, gy+8, 92*(1-bob*0.004), 9, 0, 0, 7); ctx.fill();
+
+    function drawLeg(off, phase, back){
+      var th = t*omega + phase + off;
+      var hipXp = cx + off;
+      var fx = hipXp + Math.sin(th)*stepA;
+      var swing = Math.cos(th);
+      var fy = gy - Math.max(0, swing)*clear;
+      var p = legIK(hipXp, bodyY+14, fx, fy, L1, L2);
+      ctx.lineCap="round";
+      ctx.strokeStyle = back ? "#42536e" : "#9db4d4";
+      ctx.lineWidth = back?4:5.5;
+      ctx.beginPath(); ctx.moveTo(hipXp, bodyY+14); ctx.lineTo(p.kx,p.ky); ctx.lineTo(fx,fy); ctx.stroke();
+      // foot
+      ctx.fillStyle = back ? "#5b6f8c" : "#cfdcf0";
+      ctx.beginPath(); ctx.ellipse(fx, fy-1, 7, 3, 0, 0, 7); ctx.fill();
+      // contact flash
+      if(!back && Math.cos(th) < 0.2 && Math.cos(th) > -0.2){
+        ctx.fillStyle="rgba(86,216,221,0.5)";
+        ctx.beginPath(); ctx.arc(fx, gy, 4, 0, 7); ctx.fill();
+      }
     }
-    subs.forEach(function(sub, i){
-      var dx=sub.tx-sub.x, dy=sub.ty-sub.y, d=Math.hypot(dx,dy);
-      if(d>2){ sub.x += dx/d*1.4; sub.y += dy/d*1.4; }
-      var color = ["#56d8dd","#e8b054","#7ee787","#ff7b72"][i];
-      ctx.strokeStyle="#22304a"; ctx.lineWidth=1;
-      ctx.setLineDash([4,5]); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(sub.x,sub.y); ctx.stroke(); ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(sub.x,sub.y,7,0,7); ctx.fillStyle=color; ctx.fill();
-      ctx.strokeStyle=color; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.arc(sub.x,sub.y,11+Math.sin(t*3+i)*2,0,7); ctx.globalAlpha=.35; ctx.stroke(); ctx.globalAlpha=1;
-      ctx.fillStyle="#9fb2c8"; ctx.font="9px ui-monospace,monospace";
-      ctx.fillText("sub"+(i+1), sub.x+12, sub.y+3);
-    });
+    // back pair (dim, offset)
+    drawLeg(-hipX+3, Math.PI, true);
+    drawLeg( hipX+3, 0, true);
+    // body
+    var grad = ctx.createLinearGradient(cx-80, bodyY-16, cx+80, bodyY+16);
+    grad.addColorStop(0,"#243b5e"); grad.addColorStop(1,"#16283f");
+    ctx.fillStyle=grad; ctx.strokeStyle="#56d8dd"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.roundRect(cx-84, bodyY-14, 168, 30, 10); ctx.fill(); ctx.stroke();
+    // OLED face
+    ctx.fillStyle="#0a0f16";
+    ctx.beginPath(); ctx.roundRect(cx-16, bodyY-8, 32, 18, 4); ctx.fill();
+    ctx.fillStyle="#7ee787";
+    ctx.beginPath(); ctx.arc(cx-7, bodyY+0, 2.6, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx+7, bodyY+0, 2.6, 0, 7); ctx.fill();
+    ctx.strokeStyle="#7ee787"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.arc(cx, bodyY+3, 5, 0.25*Math.PI, 0.75*Math.PI); ctx.stroke();
+    // wifi arc
+    var wp = (t*2)%1;
+    ctx.strokeStyle="rgba(86,216,221,"+(0.9-wp*0.9)+")"; ctx.lineWidth=2;
+    for(var w=1; w<=3; w++){
+      ctx.beginPath(); ctx.arc(cx+96, bodyY-10, w*7 - wp*2, -0.9, 0.9); ctx.stroke();
+    }
     ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace";
-    ctx.fillText("4/4 tasks validated · headless Gazebo", 14, 22);
+    ctx.fillText("sesame-ctrl (AP)", cx+74, bodyY-38);
+    // front pair
+    drawLeg(-hipX, 0, false);
+    drawLeg( hipX, Math.PI, false);
+    // hip dots
+    ctx.fillStyle="#dbe7f5";
+    ctx.beginPath(); ctx.arc(cx-hipX, bodyY+14, 4, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx+hipX, bodyY+14, 4, 0, 7); ctx.fill();
+    if(viewHud){
+      var hud=$("hud-quad");
+      if(hud) hud.innerHTML = "buck <b>" + (2.05+0.15*Math.abs(Math.sin(t*0.9))).toFixed(2) + " A</b> · 5.0" + Math.round(1+Math.random()*2) + " V<br>slip <b>0%</b> · clients <b>3</b> · face <b>WALK</b>";
+    }
   }
 
-  /* ---------- 3 · SIH agent ---------- */
-  var sihS = makeTerm($("term-sih"), [
-    {text:"step 1/4 · navigate /results?q=swarm+docking"},
-    {text:"step 2/4 · click 'Read' → extract fields", cls:"cy"},
-    {text:"pii-scan: author field → 'A. Sharma & co.' → REDACT", cls:"rd"},
-    {text:"step 3/4 · client-side mask applied (no server copy)", cls:"rd"},
-    {text:"step 4/4 · payload: abstract only · 0 pii bytes", cls:"ok"},
-    {text:"leak-meter: 0 / 0 B · run_042 PASS", cls:"ok"},
-  ], 0);
-  var sihCycle = 0;
-  function sihStep(){
-    sihCycle++;
-    var el = $("sih-pii");
-    if(sihCycle % 6 === 3){
+  /* ================= 2 · SWARM ================= */
+  var swarmCv = $("cv-swarm");
+  var swarmT = makeTerm($("term-swarm"), [
+    { text:"task_router: new task area_scan_3 (priority 2)" },
+    { text:"scores: sub2 0.87 (bat 82%, d 3.2m) > sub4 0.79 > sub1 0.44", cls:"cy" },
+    { text:"sub2 ASSIGNED area_scan_3 · eta 14 s · route cached", cls:"ok" },
+    { text:"mesh: 5 nodes · rssi -48 dBm · qos 0 drops" },
+    { text:"sub1 dock-approach · failsafe nav armed · 41 m to dock", cls:"am" },
+    { text:"battery watch: sub4 41% < 45% -> return-and-charge", cls:"am" },
+    { text:"task_router: task done (4/4) · dock cycle ok · 1.29 s build" },
+  ]);
+  var SWARMS = [];
+  function resetSwarm(){
+    var s = fit(swarmCv);
+    SWARMS = [];
+    for(var i=0;i<4;i++){
+      var a = i*Math.PI/2 + 0.7;
+      SWARMS.push({ x: s.w/2+Math.cos(a)*70, y: s.h/2+Math.sin(a)*48,
+        tx: s.w/2+Math.cos(a)*70, ty: s.h/2+Math.sin(a)*48,
+        bat: 60+Math.random()*35, hist: [], score: 0, flash: 0 });
+    }
+  }
+  var swarmT2 = 0;
+  function drawSwarm(t){
+    var s = fit(swarmCv), ctx = s.ctx, W=s.w, H=s.h;
+    ctx.clearRect(0,0,W,H);
+    var cx=W/2, cy=H/2, R=Math.min(W,H)/2*0.82;
+    // arena
+    ctx.strokeStyle="#1d2836";
+    [0.33,0.62,0.9].forEach(function(r){ ctx.beginPath(); ctx.arc(cx,cy,R*r,0,7); ctx.lineWidth=1; ctx.stroke(); });
+    ctx.beginPath(); ctx.moveTo(cx-R,cy); ctx.lineTo(cx+R,cy); ctx.moveTo(cx,cy-R); ctx.lineTo(cx,cy+R); ctx.strokeStyle="#141d2b"; ctx.stroke();
+    // radar sweep
+    var sw = t*0.9;
+    var grd = ctx.createConicGradient ? null : null;
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(sw%6.283);
+    ctx.strokeStyle="rgba(86,216,221,0.22)"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(R,0); ctx.stroke();
+    ctx.restore();
+
+    // task reassignment
+    swarmT2 += 1/60;
+    if(swarmT2 > 3.2){
+      swarmT2 = 0;
+      var sub = SWARMS[Math.floor(Math.random()*4)];
+      var a = Math.random()*6.283, rr = R*(0.35+Math.random()*0.45);
+      sub.tx = cx+Math.cos(a)*rr; sub.ty = cy+Math.sin(a)*rr;
+      sub.score = 0.6+Math.random()*0.39; sub.flash = 1;
+    }
+    // mother drone
+    var mr = 18;
+    ctx.save(); ctx.translate(cx,cy);
+    // rotor blurs
+    for(var i=0;i<6;i++){
+      var ra = i*Math.PI/3 + t*0.3;
+      var rx = Math.cos(ra)*mr*1.5, ry = Math.sin(ra)*mr*1.5;
+      ctx.strokeStyle="rgba(159,178,200,0.25)"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(rx,ry,6,0,7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx-Math.cos(t*20+i)*4, ry); ctx.lineTo(rx+Math.cos(t*20+i)*4, ry); ctx.stroke();
+    }
+    hex(ctx,0,0,mr,t*0.25,"#1d3557","#56d8dd",2);
+    ctx.fillStyle="#56d8dd"; ctx.beginPath(); ctx.arc(0,0,3,0,7); ctx.fill();
+    ctx.restore();
+    ctx.fillStyle="#8b98ab"; ctx.font="10px ui-monospace,monospace"; ctx.textAlign="center";
+    ctx.fillText("MOTHER · hexacopter", cx, cy+mr+16); ctx.textAlign="left";
+
+    // subs
+    SWARMS.forEach(function(sub, i){
+      var dx=sub.tx-sub.x, dy=sub.ty-sub.y, d=Math.hypot(dx,dy);
+      var spd = 1.6 + (1-Math.min(1,d/120))*0.5;
+      if(d>3){ sub.x += dx/d*spd; sub.y += dy/d*spd; }
+      sub.bat = Math.max(24, sub.bat - 0.004);
+      sub.hist.push({x:sub.x, y:sub.y}); if(sub.hist.length>26) sub.hist.shift();
+      // trail
+      sub.hist.forEach(function(p, j){
+        ctx.fillStyle = "rgba(86,216,221,"+ (j/sub.hist.length)*0.35 +")";
+        ctx.fillRect(p.x-1, p.y-1, 2, 2);
+      });
+      // mesh line
+      ctx.setLineDash([5,6]); ctx.lineDashOffset = -t*24;
+      ctx.strokeStyle = sub.flash>0 ? "rgba(126,231,135,0.7)" : "rgba(34,48,74,0.9)";
+      ctx.lineWidth = sub.flash>0 ? 2 : 1.2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(sub.x,sub.y); ctx.stroke();
+      ctx.setLineDash([]);
+      // body
+      var colors = ["#56d8dd","#e8b054","#7ee787","#ff7b72"];
+      hex(ctx, sub.x, sub.y, 8, Math.atan2(dy,dx)+1.57, "#101a29", colors[i], 2);
+      if(sub.flash>0){
+        ctx.strokeStyle="rgba(126,231,135,"+sub.flash+")"; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(sub.x,sub.y,14+(1-sub.flash)*16,0,7); ctx.stroke();
+        sub.flash -= 0.02;
+      }
+      // battery bar
+      ctx.fillStyle="#1d2836"; ctx.fillRect(sub.x-11, sub.y+13, 22, 3);
+      ctx.fillStyle = sub.bat<45 ? "#ff7b72" : "#7ee787";
+      ctx.fillRect(sub.x-11, sub.y+13, 22*sub.bat/100, 3);
+      ctx.fillStyle="#8b98ab"; ctx.font="9px ui-monospace,monospace";
+      ctx.fillText("sub"+(i+1)+" "+Math.round(sub.bat)+"%", sub.x+13, sub.y+16);
+      if(sub.flash>0.6){
+        ctx.fillStyle="#7ee787";
+        ctx.fillText("score "+sub.score.toFixed(2), sub.x+13, sub.y-12);
+      }
+    });
+    // hud
+    var hud=$("hud-swarm");
+    if(hud) hud.innerHTML = "nodes <b>5</b> · rssi <b>-48 dBm</b> · drops <b>0</b><br>tasks <b>4/4</b> · sim <b>Gazebo headless</b>";
+    // header text
+    ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText("top-down · carrier swarm · task scoring live", 14, 22);
+  }
+
+  /* ================= 3 · SIH PII AGENT ================= */
+  var sihT = makeTerm($("term-sih"), [
+    { text:"run_042 start · target: papers.example.org/results" },
+    { text:"step 1/4 · navigate + parse result cards (3 found)", cls:"cy" },
+    { text:"step 2/4 · click 'Read' · DOM snapshot 412 nodes" },
+    { text:"pii-scan: field=author value='A. Sharma & co.' -> REDACT (rule:person)", cls:"rd" },
+    { text:"step 3/4 · client-side mask applied · server copy never created", cls:"rd" },
+    { text:"step 4/4 · payload: abstract + venue only", cls:"ok" },
+    { text:"leak-meter: 0 B of 0 B personal bytes · PASS", cls:"ok" },
+  ]);
+  var sihPhase = 0;
+  function sihFrame(){
+    sihPhase++;
+    var el = $("sih-pii"), abs = $("sih-abs"), rdx = $("sih-rdx"), rdx2 = $("sih-rdx2");
+    var p = sihPhase % 14;
+    if(p === 2){ el.style.visibility="hidden"; abs.textContent=""; }
+    if(p === 3){ el.style.visibility="visible"; }
+    if(p === 5){ // scan
+      el.classList.add("scanning");
+      var sb = $("sih-scan");
+      if(sb){ sb.style.display="block"; sb.style.left="0%";
+        requestAnimationFrame(function(){ sb.style.transition="transform 0.9s linear"; sb.style.transform="translateX(280px)"; });
+      }
+    }
+    if(p === 7){
+      el.classList.remove("scanning");
       el.classList.add("redacted");
-      $("sih-rdx").textContent = 1 + Math.floor(sihCycle/6);
-      setTimeout(function(){ el.classList.remove("redacted"); el.style.display="none";
-        setTimeout(function(){ el.style.display=""; }, 2200); }, 1800);
+      if(rdx) rdx.textContent = (1+Math.floor(sihPhase/14));
+      if(rdx2) rdx2.textContent = (1+Math.floor(sihPhase/14));
+      if(sb) { sb.style.display="none"; sb.style.transition="none"; sb.style.transform="translateX(0)"; }
+      abs.textContent = "We demonstrate autonomous docking of up to 6 sub-drones with a capability-aware task router…";
     }
+    if(p === 12){ el.classList.remove("redacted"); el.style.visibility="visible"; }
   }
-  setInterval(sihStep, 1400);
+  setInterval(sihFrame, 850);
 
-  /* ---------- 4 · gurtai ---------- */
-  var gurtaiS = makeTerm($("term-gurtai"), [
-    {text:"llama3:8b-q4 · served · ctx 4096 · 42 tok/s", cls:"cy"},
-    {text:"prompt: 'summarize the gurtai repo' → 581 tokens"},
-    {text:"gen: 96 tokens · 2.1 s · temperature 0.3"},
-    {text:"api cost: $0.00 · queries today: 41 · cache hit 82%", cls:"ok"},
-    {text:"plugin: repo-summarizer → reply queued to telegram"},
-  ], 0);
-  var gurtaiPhase = 0;
-  function gurtaiStep(){
-    gurtaiPhase++;
+  /* ================= 4 · GURTAI ================= */
+  var gurtaiT = makeTerm($("term-gurtai"), [
+    { text:"llama3:8b-q4 · served on :11434 · ctx 4096", cls:"cy" },
+    { text:"prompt: 'summarize the gurtai repo' -> 581 tokens" },
+    { text:"gen: 96 tok @ " + (38+Math.floor(Math.random()*14)) + " tok/s · temp 0.3 · 2.1 s" },
+    { text:"api cost: $0.00 · queries today 41 · cache hit 82%", cls:"ok" },
+    { text:"plugin: repo-summarizer -> reply queued to telegram" },
+    { text:"watchdog: gpu share 0% · cpu 12% · thermal ok", cls:"ok" },
+  ]);
+  var gPhase = 0;
+  var BOT1 = "Gurtai = Python Telegram bot running local LLMs via Ollama. Plugin-based: each plugin adds a task (fetch, summarize, automate). Docker one-liner deploy. Zero per-query API cost.";
+  var USER2 = "is it really $0 cost?";
+  var BOT2 = "Yep - inference runs on your own GPU/CPU via Ollama. Cost = electricity. API spend: $0.00 (see terminal).";
+  function gurtaiFrame(){
+    gPhase++;
     var out = $("gurtai-out");
-    if(gurtaiPhase === 2){
-      out.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
-      out.classList.add("typing");
+    var p = gPhase % 16;
+    function setBase(){
+      out.innerHTML = '<div class="msg user">summarize the gurtai repo</div><div class="msg bot" id="gb1">Ready - asking a local model.</div>';
     }
-    if(gurtaiPhase === 4){
-      out.classList.remove("typing");
-      var full = "Gurtai = Python Telegram bot running local LLMs via Ollama. Plugin-based: each plugin adds a task (fetch, summarize, automate). Docker one-liner deploy. Zero per-query API cost.";
-      out.textContent = ""; var ci = 0;
-      var iv = setInterval(function(){ ci += 3; out.textContent = full.slice(0,ci); if(ci >= full.length) clearInterval(iv); }, 30);
+    if(p === 0){ setBase(); gPhase=gPhase; }
+    if(p === 2){ var b=$("gb1"); if(b){ b.innerHTML='<span class="typing"><span></span><span></span><span></span></span>'; b.classList.add("typing"); } }
+    if(p === 4){
+      var b1=$("gb1");
+      if(b1){
+        b1.classList.remove("typing"); b1.textContent="";
+        var ci=0, iv=setInterval(function(){ ci+=2; b1.textContent=BOT1.slice(0,ci); if(ci>=BOT1.length) clearInterval(iv); }, 40);
+      }
     }
-    if(gurtaiPhase === 8){
-      out.innerHTML = '<div class="msg user" style="margin-top:6px">is it really 0 cost?</div><div class="msg bot">Yep — inference runs on local GPU/CPU. Cost = electricity. API spend: $0.00.</div>';
-    }
-    if(gurtaiPhase > 14){ gurtaiPhase = 0; out.innerHTML = "Gurtai = Python Telegram bot running local LLMs via Ollama. Plugin-based: each plugin adds a task (fetch, summarize, automate). Docker one-liner deploy. Zero per-query API cost."; }
+    if(p === 8){ out.insertAdjacentHTML("beforeend", '<div class="msg user" id="gu2"></div>'); var u=$("gu2"); if(u){ var ci2=0, iv2=setInterval(function(){ ci2+=3; u.textContent=USER2.slice(0,ci2); if(ci2>=USER2.length) clearInterval(iv2); }, 50); } }
+    if(p === 10){ var b2=document.getElementById("gb2"); if(!b2){ out.insertAdjacentHTML("beforeend", '<div class="msg bot typing" id="gb2"><span></span><span></span><span></span></div>'); } }
+    if(p === 12){ var b3=$("gb2"); if(b3){ b3.classList.remove("typing"); b3.textContent=BOT2; } }
+    if(p === 14){ var u2=$("gu2"), b4=$("gb2"); if(u2 && b4){ /* hold */ } }
+    if(p === 15){ setBase(); }
   }
-  setInterval(gurtaiStep, 1500);
+  setInterval(gurtaiFrame, 900);
 
-  /* ---------- view gating + loops ---------- */
-  var view = {};
-  ["cv-quad","cv-swarm"].forEach(function(id){
-    var cv = $(id);
-    if(reduce){
-      // static frames
-      if(id==="cv-quad"){ drawQuad(0.8); } else {
-        subs[0]={x:0,y:0,tx:0,ty:0};
-        // place statically
-        var s=fit(swarm);
-        subs[0].x=s.w*0.3;subs[0].y=s.h*0.3;subs[0].tx=subs[0].x;subs[0].ty=subs[0].y;
-        subs[1].x=s.w*0.7;subs[1].y=s.h*0.35;subs[1].tx=subs[1].x;subs[1].ty=subs[1].y;
-        subs[2].x=s.w*0.35;subs[2].y=s.h*0.7;subs[2].tx=subs[2].x;subs[2].ty=subs[2].y;
-        subs[3].x=s.w*0.7;subs[3].y=s.h*0.65;subs[3].tx=subs[3].x;subs[3].ty=subs[3].y;
-        drawSwarm(1);
-      }
-      quadS.prime(); swarmS.prime(); sihS.prime(); gurtaiS.prime();
-      return;
-    }
-    new IntersectionObserver(function(entries){
-      view[id] = entries[0].isIntersecting;
-      if(view[id]){
-        if(id==="cv-quad"){ quadS.prime(); } else {
-          var s2=fit(swarm);
-          subs.forEach(function(sub,i){ var a=i*Math.PI/2+0.7; sub.x=sub.tx=s2.w/2+Math.cos(a)*80; sub.y=sub.ty=s2.h/2+Math.sin(a)*55; });
+  /* ================= view gating + master loop ================= */
+  var view = { quad:false, swarm:false };
+  var started = { quad:false, swarm:false };
+  function gate(cv, key){
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        view[key] = e.isIntersecting;
+        if(e.isIntersecting && !started[key]){
+          started[key] = true;
+          if(key==="swarm") resetSwarm();
         }
-      }
-    }, {threshold:0.1}).observe(cv.parentElement.closest(".demo"));
-  });
+      });
+    }, { threshold: 0.05 }).observe(cv.parentElement.closest(".demo"));
+  }
+
+  var last = 0;
   function loop(now){
     var t = now/1000;
-    if(view["cv-quad"]){ drawQuad(t); quadS.step(); }
-    if(view["cv-swarm"]){ drawSwarm(t); swarmS.step(); }
+    if(view.quad && !pauses.sesame){ drawQuad(t, now-last>350); last=now; quadT.step(); }
+    if(view.swarm && !pauses.swarm){ drawSwarm(t); swarmT.step(); }
     requestAnimationFrame(loop);
   }
-  requestAnimationFrame(loop);
 
-  /* ---------- demo parallax (GSAP optional) ---------- */
-  if(window.gsap && window.ScrollTrigger){
-    gsap.utils.toArray(".demo").forEach(function(demo){
-      gsap.from(demo, { opacity:0, y:46, duration:0.9, ease:"power3.out",
-        scrollTrigger:{ trigger:demo, start:"top 82%" } });
-      var panel = demo.querySelector(".demo-panel");
-      gsap.from(panel, { opacity:0, scale:0.97, duration:1, ease:"power2.out",
-        scrollTrigger:{ trigger:demo, start:"top 80%" } });
-      var glow = demo.querySelector(".stage .glow");
-      if(glow){
-        gsap.fromTo(glow, { opacity: 0.5 }, { opacity: 1,
-          scrollTrigger:{ trigger:demo, start:"top bottom", end:"bottom top", scrub:true } });
-      }
-    });
-    // subtle parallax on panel vs info
-    gsap.utils.toArray(".demo").forEach(function(demo){
-      gsap.to(demo.querySelector(".demo-info"), {
-        yPercent:-8, ease:"none",
-        scrollTrigger:{ trigger:demo, start:"top bottom", end:"bottom top", scrub:true }
+  // play/pause buttons
+  document.querySelectorAll(".demo").forEach(function(demo){
+    var btn = demo.querySelector(".demo-pp");
+    if(btn){
+      btn.addEventListener("click", function(){
+        var key = demo.id.replace("demo-","");
+        pauses[key] = !pauses[key];
+        btn.textContent = pauses[key] ? "▶ play" : "❚❚ pause";
       });
-    });
+    }
+  });
+
+  if(reduce){
+    // static frames + primed terminals
+    quadT.prime(); swarmT.prime(); sihT.prime(); gurtaiT.prime();
+    resetSwarm(); drawSwarm(1.4);
+    drawQuad(0.8, false);
+    document.querySelectorAll(".demo-pp").forEach(function(b){ b.style.display="none"; });
+    return;
   }
+
+  gate(quadCv, "quad"); gate(swarmCv, "swarm");
+  requestAnimationFrame(loop);
 })();
+
 </script>
 
 </body>
