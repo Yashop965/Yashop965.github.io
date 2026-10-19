@@ -345,7 +345,7 @@ footer a:hover{text-decoration:underline}
         <p>The agent browses a results page, extracts fields, and client-side redacts personal names before anything leaves the machine — the exact behavior the PII leak-rate benchmark measures. Watch the author name get blacked out; the leak counter stays at zero.</p>
         <a class="repo" href="https://github.com/Yashop965/sih2026-ps171-browser-agent" target="_blank">sih2026-ps171-browser-agent</a>
       </div>
-      <div class="demo-panel">
+      <div class="demo-panel"><button class="demo-pp">❚❚ pause</button>
         <div class="stage">
           <div class="fakebrowser">
             <div class="fb-bar"><span class="dot d1" style="width:8px;height:8px;border-radius:50%;background:#ff5f57;display:inline-block"></span><span class="dot d2" style="width:8px;height:8px;border-radius:50%;background:#febc2e;display:inline-block"></span><span class="dot d3" style="width:8px;height:8px;border-radius:50%;background:#28c840;display:inline-block"></span><span class="u">papers.example.org/results?q=swarm+docking</span></div>
@@ -376,7 +376,7 @@ footer a:hover{text-decoration:underline}
         <p>A Telegram user asks for a repo summary; the reply streams from a local model (Ollama), zero API cost. The side terminal shows inference metrics — quantized weights, tokens/sec, and the cost line that never moves.</p>
         <a class="repo" href="https://github.com/Yashop965/gurtai" target="_blank">gurtai <span class="repopill">+ runanywhere-sdks</span></a>
       </div>
-      <div class="demo-panel" style="flex-direction:row;align-items:stretch">
+      <div class="demo-panel" style="flex-direction:row;align-items:stretch"><button class="demo-pp">❚❚ pause</button>
         <div class="phone-wrap">
           <div class="phone">
             <div class="notch"></div>
@@ -845,10 +845,25 @@ footer a:hover{text-decoration:underline}
   }
 
   var last = 0;
+  var primed = {};
   function loop(now){
     var t = now/1000;
-    if(view.quad && !pauses.sesame){ drawQuad(t, now-last>350); last=now; quadT.step(); }
-    if(view.swarm && !pauses.swarm){ drawSwarm(t); swarmT.step(); }
+    if(view.quad){
+      if(!started.quad){ started.quad = true; quadT.prime(); }
+      if(!pauses.sesame){ drawQuad(t, now-last>350); last=now; quadT.step(); }
+    }
+    if(view.swarm){
+      if(!primed.swarm){ primed.swarm = true; resetSwarm(); swarmT.prime(); }
+      if(!pauses.swarm){ drawSwarm(t); swarmT.step(); }
+    }
+    if(view.sih){
+      if(!primed.sih){ primed.sih = true; sihT.prime(); }
+      if(!pauses.sih) sihT.step();
+    }
+    if(view.gurtai){
+      if(!primed.gurtai){ primed.gurtai = true; gurtaiT.prime(); }
+      if(!pauses.gurtai) gurtaiT.step();
+    }
     requestAnimationFrame(loop);
   }
 
@@ -874,6 +889,8 @@ footer a:hover{text-decoration:underline}
   }
 
   gate(quadCv, "quad"); gate(swarmCv, "swarm");
+  new IntersectionObserver(function(es){ es.forEach(function(e){ view.sih = e.isIntersecting; }); }, {threshold:0.05}).observe(document.getElementById("demo-sih"));
+  new IntersectionObserver(function(es){ es.forEach(function(e){ view.gurtai = e.isIntersecting; }); }, {threshold:0.05}).observe(document.getElementById("demo-gurtai"));
   requestAnimationFrame(loop);
 })();
 
