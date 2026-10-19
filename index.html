@@ -107,6 +107,55 @@ footer a:hover{text-decoration:underline}
   .blob{animation:none}
   *{transition:none!important}
 }
+
+/* ============ LIVE DEMOS ============ */
+.demos-head p{color:var(--muted);max-width:640px;margin:-8px 0 26px;font-size:.95rem}
+.demo{display:grid;grid-template-columns:330px 1fr;gap:22px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;margin-bottom:26px;position:relative;overflow:hidden}
+.demo::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 220px at 85% 0%,rgba(31,78,121,.06),transparent 60%);pointer-events:none}
+.demo-info{position:relative}
+.demo-info .k{font-size:.7rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.demo-info h3{font-size:1.25rem;margin:6px 0 8px;letter-spacing:-.01em}
+.demo-info p{font-size:.9rem;color:var(--muted)}
+.demo-info .repo{display:inline-flex;gap:6px;align-items:center;margin-top:12px;font-size:.84rem;font-weight:600;color:var(--accent);text-decoration:none}
+.demo-info .repo:hover{text-decoration:underline}
+.demo-info .repopill{font-size:.72rem;background:var(--chip);border-radius:6px;padding:2px 8px;color:#42506a;font-weight:500}
+.demo-panel{position:relative;background:#0d1420;border-radius:14px;overflow:hidden;min-height:320px;display:flex;flex-direction:column}
+.demo-panel .stage{flex:1;position:relative;min-height:220px}
+.demo-panel canvas{position:absolute;inset:0;width:100%;height:100%}
+.demo-panel .stage .glow{position:absolute;inset:0;background:radial-gradient(420px 240px at 50% 42%,rgba(86,180,255,.10),transparent 70%);pointer-events:none}
+/* terminal */
+.term{background:#0a0f16;border-top:1px solid #1d2836}
+.term-head{display:flex;align-items:center;gap:8px;padding:8px 12px;font-family:ui-monospace,Consolas,monospace;font-size:.72rem;color:#8b98ab;background:#0d1420}
+.term-head .dot{width:9px;height:9px;border-radius:50%}
+.term-head .d1{background:#ff5f57}.term-head .d2{background:#febc2e}.term-head .d3{background:#28c840}
+.term-head .ttl{margin-left:6px;letter-spacing:.02em}
+.term pre{margin:0;padding:10px 14px;font-family:ui-monospace,Consolas,monospace;font-size:.76rem;line-height:1.55;color:#9fb2c8;min-height:96px;max-height:132px;overflow:hidden;white-space:pre-wrap}
+.term .ok{color:#7ee787}.term .cy{color:#56d8dd}.term .am{color:#e8b054}.term .rd{color:#ff7b72}
+/* phone mock */
+.phone{width:190px;background:#0a0f16;border:2px solid #22304a;border-radius:26px;padding:10px 8px;margin:14px auto;position:relative;z-index:2}
+.phone .notch{width:56px;height:5px;background:#22304a;border-radius:99px;margin:0 auto 8px}
+.phone .app{display:flex;justify-content:space-between;align-items:center;font-size:.62rem;color:#8b98ab;padding:0 4px 6px;border-bottom:1px solid #1d2836;font-family:ui-monospace,monospace}
+.phone .chat{display:flex;flex-direction:column;gap:7px;padding:10px 4px;min-height:150px}
+.msg{max-width:82%;font-size:.68rem;line-height:1.45;border-radius:10px;padding:7px 10px;font-family:ui-monospace,monospace}
+.msg.user{align-self:flex-end;background:#1d3557;color:#dbe7f5;border-bottom-right-radius:3px}
+.msg.bot{align-self:flex-start;background:#16202e;color:#9fb2c8;border-bottom-left-radius:3px}
+.msg.bot.typing span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#56d8dd;margin-right:3px;animation:tp 1s infinite}
+.msg.bot.typing span:nth-child(2){animation-delay:.15s}.msg.bot.typing span:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,100%{opacity:.2}50%{opacity:1}}
+.phone-wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center}
+/* fake browser */
+.fakebrowser{background:#0a0f16;border:1px solid #22304a;border-radius:10px;overflow:hidden;margin:14px auto;max-width:400px;width:92%;position:relative;z-index:2}
+.fb-bar{display:flex;align-items:center;gap:8px;background:#0d1420;padding:8px 10px;border-bottom:1px solid #1d2836}
+.fb-bar .u{flex:1;background:#16202e;border-radius:6px;font-size:.62rem;color:#8b98ab;font-family:ui-monospace,monospace;padding:3px 10px}
+.fb-body{padding:14px;font-family:ui-monospace,monospace}
+.fb-body .lbl{font-size:.6rem;color:#5b6675;letter-spacing:.08em;text-transform:uppercase}
+.fb-body input{width:100%;background:#16202e;border:1px solid #22304a;border-radius:6px;color:#dbe7f5;font-size:.72rem;padding:7px 10px;font-family:inherit;margin:5px 0 12px}
+.fb-body .pii{color:#dbe7f5}
+.fb-body .pii.redacted{background:#3d1d24;color:#ff7b72;box-shadow:inset 0 0 0 1px #ff7b72;text-decoration:line-through}
+.demo-meta{display:flex;gap:10px;margin-top:10px;font-size:.7rem;color:#8b98ab;font-family:ui-monospace,monospace;flex-wrap:wrap}
+.demo-meta b{color:#7ee787;font-weight:600}
+@media(max-width:860px){.demo{grid-template-columns:1fr}.demo-panel{min-height:0}}
+
 </style>
 </head>
 <body>
@@ -228,6 +277,107 @@ footer a:hover{text-decoration:underline}
   </div>
 </section>
 
+
+<section id="demos">
+  <div class="wrap">
+    <h2 data-anim>Live Demos</h2>
+    <p class="demos-head" data-anim>Front-end mini-simulations of the flagship projects — no backend, no install. Watch each system behave the way it does on the bench.</p>
+
+    <!-- 1 · SESAME QUADRUPED -->
+    <div class="demo" id="demo-sesame">
+      <div class="demo-info">
+        <div class="k">Flagship · Hardware</div>
+        <h3>Sesame — ESP32 Quadruped</h3>
+        <p>Live gait cycle: 4 legs, 2 joints each, trot pattern at 1.1 Hz. The terminal mirrors the serial monitor — servo PWM allocation and the incident-fixed 5A buck holding under 8-servo load.</p>
+        <a class="repo" href="https://github.com/Yashop965/sesame-robot" target="_blank">sesame-robot <span class="repopill">open source</span></a>
+      </div>
+      <div class="demo-panel">
+        <div class="stage"><canvas id="cv-quad"></canvas><div class="glow"></div></div>
+        <div class="term">
+          <div class="term-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="ttl">esp32 · serial monitor · 115200</span></div>
+          <pre id="term-quad"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · SWARM -->
+    <div class="demo" id="demo-swarm">
+      <div class="demo-info">
+        <div class="k">Flagship · ROS2 Simulation</div>
+        <h3>Swarm — Carrier Hexacopter</h3>
+        <p>Top-down: the mother drone scores each sub-drone (battery, proximity, payload) and delegates tasks; subs reposition between waypoints. Router log streams the assignments — 4/4 validated in Gazebo.</p>
+        <a class="repo" href="https://github.com/Yashop965" target="_blank">ROS2 Humble + Gazebo <span class="repopill">sim workspace</span></a>
+      </div>
+      <div class="demo-panel">
+        <div class="stage"><canvas id="cv-swarm"></canvas><div class="glow"></div></div>
+        <div class="term">
+          <div class="term-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="ttl">ros2 · task_router · /swarm/assign</span></div>
+          <pre id="term-swarm"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · SIH AGENT -->
+    <div class="demo" id="demo-sih">
+      <div class="demo-info">
+        <div class="k">Flagship · SIH 2026 (ISRO)</div>
+        <h3>PII-Aware Browser Agent</h3>
+        <p>The agent browses a results page, extracts fields, and client-side redacts personal names before anything leaves the machine — the exact behavior the PII leak-rate benchmark measures. Watch the author name get blacked out; the leak counter stays at zero.</p>
+        <a class="repo" href="https://github.com/Yashop965/sih2026-ps171-browser-agent" target="_blank">sih2026-ps171-browser-agent</a>
+      </div>
+      <div class="demo-panel">
+        <div class="stage">
+          <div class="fakebrowser">
+            <div class="fb-bar"><span class="dot d1" style="width:8px;height:8px;border-radius:50%;background:#ff5f57;display:inline-block"></span><span class="dot d2" style="width:8px;height:8px;border-radius:50%;background:#febc2e;display:inline-block"></span><span class="dot d3" style="width:8px;height:8px;border-radius:50%;background:#28c840;display:inline-block"></span><span class="u">papers.example.org/results?q=swarm+docking</span></div>
+            <div class="fb-body">
+              <div class="lbl">Author</div>
+              <div class="pii" id="sih-pii">A. Sharma &amp; co.</div>
+              <div class="lbl" style="margin-top:10px">Abstract (PII-safe)</div>
+              <div id="sih-abs" style="font-size:.72rem;color:#9fb2c8;min-height:24px">“…we demonstrate autonomous docking of up to 6 sub-drones…”</div>
+            </div>
+          </div>
+          <div class="demo-meta"><span>PII bytes leaked <b>0</b></span><span>redactions <b id="sih-rdx">1</b></span><span>client-side only <b>✓</b></span></div>
+        </div>
+        <div class="term">
+          <div class="term-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="ttl">agent · run log · run_042</span></div>
+          <pre id="term-sih"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 · GURTAI -->
+    <div class="demo" id="demo-gurtai">
+      <div class="demo-info">
+        <div class="k">Flagship · Local AI</div>
+        <h3>Gurtai — Local-LLM Assistant</h3>
+        <p>A Telegram user asks for a repo summary; the reply streams from a local model (Ollama), zero API cost. The side terminal shows inference metrics — quantized weights, tokens/sec, and the cost line that never moves.</p>
+        <a class="repo" href="https://github.com/Yashop965/gurtai" target="_blank">gurtai <span class="repopill">+ runanywhere-sdks</span></a>
+      </div>
+      <div class="demo-panel" style="flex-direction:row;align-items:stretch">
+        <div class="phone-wrap">
+          <div class="phone">
+            <div class="notch"></div>
+            <div class="app"><span>Telegram</span><span>● Gurtai <i style="color:#7ee787">local</i></span></div>
+            <div class="chat">
+              <div class="msg user">summarize the gurtai repo</div>
+              <div class="msg bot" id="gurtai-out">
+                Gurtai = Python Telegram bot running local LLMs via Ollama. Plugin-based: each plugin adds a task (fetch, summarize, automate). Docker one-liner deploy. Zero per-query API cost.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:1.2;display:flex;flex-direction:column;min-width:0">
+          <div class="term" style="border-radius:0">
+            <div class="term-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="ttl">ollama · llama3:8b-q4 · :11434</span></div>
+            <pre id="term-gurtai"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <section id="timeline">
   <div class="wrap">
     <h2 data-anim>Experience & Milestones</h2>
@@ -315,5 +465,266 @@ footer a:hover{text-decoration:underline}
   });
 })();
 </script>
+
+<script>
+/* ================= LIVE DEMO ENGINES ================= */
+(function(){
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- terminal typing engine ---------- */
+  function makeTerm(el, lines, holdFrames){
+    var li = 0, ci = 0, out = [], frame = 0;
+    function render(){
+      out = out.slice(-7);
+      el.innerHTML = out.map(function(l){ return l.cls ? '<span class="'+l.cls+'">'+esc(l.text)+'</span>' : esc(l.text); }).join("\n");
+    }
+    function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+    function step(){
+      frame++;
+      var line = lines[li];
+      if(ci < line.text.length){
+        // type 4 chars per frame
+        var take = line.text.slice(0, ci+4); ci += 4;
+        if(out.length === 7 || !out.length || out[out.length-1].wip){
+          out.push({text:take, cls:line.cls, wip:true});
+          if(out.length>7) out.shift();
+        } else {
+          out[out.length-1].text = take;
+        }
+        render();
+      } else {
+        if(out.length && out[out.length-1].wip) out[out.length-1].wip = false;
+        out.push({text:"", wip:true});
+        ci = 0; li = (li+1) % lines.length;
+        // hold at end of cycle
+        if(li === 0) holdFrames = frame + 90;
+        render();
+      }
+      return frame > holdFrames;
+    }
+    return { step: step,
+             prime: function(){ out=[]; li=0; ci=0; frame=0; for(var i=0;i<Math.min(4,lines.length);i++){ out.push({text:lines[i].text, cls:lines[i].cls}); ci=0; } render(); } };
+  }
+
+  /* ---------- canvas helper ---------- */
+  function fit(cv){
+    var r = cv.parentElement.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = r.width * dpr; cv.height = r.height * dpr;
+    cv.getContext("2d").setTransform(dpr,0,0,dpr,0,0);
+    return { w: r.width, h: r.height };
+  }
+
+  /* ---------- 1 · sesame gait ---------- */
+  var quad = $("cv-quad");
+  var quadS = makeTerm($("term-quad"), [
+    {text:"boot ok · 8x MG90S detected · ECO limiter on (max 4 concurrent)"},
+    {text:"trot gait @ 1.1 Hz · phase offset 180°", cls:"cy"},
+    {text:"pwm: timer0=FL/FR timer1=BL/BR (50 Hz, 0.5–2.5 ms)", cls:"cy"},
+    {text:"buck: 2.1 A @ 5.02 V · thermal OK · 42 °C", cls:"ok"},
+    {text:"servo heat: FL 41° · BL 39° · ECO OK"},
+    {text:"wifi: AP sesame-ctrl · 3 clients · portal served", cls:"am"},
+    {text:"rest /api/status → {gait:trot, v:0.4 m/s, batt:7.9 V}"},
+  ], 0);
+  function drawQuad(t){
+    var s = fit(quad), ctx = quad.getContext("2d");
+    ctx.clearRect(0,0,s.w,s.h);
+    var gy = s.h*0.78;
+    ctx.strokeStyle="#22304a"; ctx.lineWidth=1;
+    for(var x=0;x<s.w;x+=28){ ctx.beginPath(); ctx.moveTo(x,gy); ctx.lineTo(x,gy+14); ctx.stroke(); }
+    ctx.strokeStyle="#3d4f68"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(s.w,gy); ctx.stroke();
+    var cx = s.w/2, bodyY = gy - 62 + Math.sin(t*2.2)*3, bw = 150, bh = 30;
+    function leg(hx, ph, back){
+      var a1 = (-0.55 + Math.sin(t*2.2 + ph)*0.5);
+      var a2 = (-1.15 + Math.sin(t*2.2 + ph + 1.2)*0.55);
+      var L1=34, L2=30;
+      var kx = hx + Math.sin(a1)*L1, ky = bodyY + Math.cos(a1)*L1 + 8;
+      var fx = kx + Math.sin(a1+a2)*L2, fy = ky + Math.cos(a1+a2)*L2;
+      var lift = Math.max(0, Math.sin(t*2.2+ph+0.6))*6;
+      ctx.strokeStyle = back ? "#5b6f8c" : "#8fa8c8"; ctx.lineWidth = back?3:4; ctx.lineCap="round";
+      ctx.beginPath(); ctx.moveTo(hx, bodyY+8); ctx.lineTo(kx,ky); ctx.lineTo(fx,fy-lift); ctx.stroke();
+      ctx.fillStyle = back ? "#42536e" : "#6e87a8";
+      ctx.beginPath(); ctx.arc(hx, bodyY+8, back?3.5:4.5, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(kx, ky, back?3:3.5, 0, 7); ctx.fill();
+      ctx.fillStyle = back ? "#5b6f8c" : "#c3d4e8";
+      ctx.beginPath(); ctx.ellipse(fx, fy-lift, 6, 2.5, 0, 0, 7); ctx.fill();
+    }
+    // back pair (drawn first, dimmer)
+    leg(cx-52, Math.PI, true); leg(cx+52, 0, true);
+    // body
+    ctx.fillStyle="#1d3557"; ctx.strokeStyle="#56d8dd"; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.roundRect(cx-bw/2, bodyY-bh/2, bw, bh, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#7ee787"; ctx.beginPath(); ctx.arc(cx+bw/2-14, bodyY, 3, 0, 7); ctx.fill();
+    ctx.fillStyle="#9fb2c8"; ctx.font="10px ui-monospace,monospace"; ctx.fillText("ESP32 · SSD1306 status: WALK", cx-bw/2+10, bodyY-10);
+    // front pair
+    leg(cx-52, 0, false); leg(cx+52, Math.PI, false);
+    ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText("trot @ 1.1 Hz", 14, 22);
+    ctx.fillStyle="#7ee787"; ctx.fillText("load: 2.1 A (5 A buck)", 14, 38);
+  }
+
+  /* ---------- 2 · swarm ---------- */
+  var swarm = $("cv-swarm");
+  var swarmS = makeTerm($("term-swarm"), [
+    {text:"task_router: new task → area_scan_3 (score: sub2 0.87 > sub4 0.79)"},
+    {text:"sub2 assigned · eta 14 s · battery 82% · dist 3.2 m", cls:"cy"},
+    {text:"mesh: 5 nodes · rssi -48 dBm · qos ok"},
+    {text:"task_router: task complete → sub1 docking (autonomous nav)", cls:"am"},
+    {text:"battery watchdog: sub4 41% < 45% → return-and-charge", cls:"am"},
+    {text:"task_router: sub4 swap-in queued (score 0.61)"},
+  ], 0);
+  var subs = [{x:0,y:0,tx:0,ty:0,v:0},{x:0,y:0,tx:0,ty:0,v:0},{x:0,y:0,tx:0,ty:0,v:0},{x:0,y:0,tx:0,ty:0,v:0}];
+  var swarmT = 0, taskTick = 0;
+  function drawSwarm(t){
+    var s = fit(swarm), ctx = swarm.getContext("2d");
+    ctx.clearRect(0,0,s.w,s.h);
+    var cx=s.w/2, cy=s.h/2;
+    // arena rings
+    ctx.strokeStyle="#1d2836";
+    [0.28,0.5,0.72].forEach(function(r){ ctx.beginPath(); ctx.arc(cx,cy,Math.min(s.w,s.h)/2*r*0.86,0,7); ctx.lineWidth=1; ctx.stroke(); });
+    // mother hex
+    var spin = t*0.4;
+    ctx.save(); ctx.translate(cx,cy); ctx.rotate(spin*0.15);
+    ctx.beginPath();
+    for(var i=0;i<6;i++){ var a=i*Math.PI/3; ctx[i?"lineTo":"moveTo"](Math.cos(a)*16, Math.sin(a)*16); }
+    ctx.closePath(); ctx.fillStyle="#1d3557"; ctx.fill(); ctx.strokeStyle="#56d8dd"; ctx.lineWidth=2; ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle="#56d8dd"; ctx.font="10px ui-monospace,monospace"; ctx.fillText("MOTHER", cx-18, cy+34);
+    taskTick++;
+    if(taskTick > 260){ taskTick = 0;
+      var sub = subs[Math.floor(Math.random()*4)];
+      var a = Math.random()*7, rr = 50 + Math.random()*60;
+      sub.tx = cx + Math.cos(a)*rr*0.9; sub.ty = cy + Math.sin(a)*rr*0.9;
+    }
+    subs.forEach(function(sub, i){
+      var dx=sub.tx-sub.x, dy=sub.ty-sub.y, d=Math.hypot(dx,dy);
+      if(d>2){ sub.x += dx/d*1.4; sub.y += dy/d*1.4; }
+      var color = ["#56d8dd","#e8b054","#7ee787","#ff7b72"][i];
+      ctx.strokeStyle="#22304a"; ctx.lineWidth=1;
+      ctx.setLineDash([4,5]); ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(sub.x,sub.y); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(sub.x,sub.y,7,0,7); ctx.fillStyle=color; ctx.fill();
+      ctx.strokeStyle=color; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(sub.x,sub.y,11+Math.sin(t*3+i)*2,0,7); ctx.globalAlpha=.35; ctx.stroke(); ctx.globalAlpha=1;
+      ctx.fillStyle="#9fb2c8"; ctx.font="9px ui-monospace,monospace";
+      ctx.fillText("sub"+(i+1), sub.x+12, sub.y+3);
+    });
+    ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText("4/4 tasks validated · headless Gazebo", 14, 22);
+  }
+
+  /* ---------- 3 · SIH agent ---------- */
+  var sihS = makeTerm($("term-sih"), [
+    {text:"step 1/4 · navigate /results?q=swarm+docking"},
+    {text:"step 2/4 · click 'Read' → extract fields", cls:"cy"},
+    {text:"pii-scan: author field → 'A. Sharma & co.' → REDACT", cls:"rd"},
+    {text:"step 3/4 · client-side mask applied (no server copy)", cls:"rd"},
+    {text:"step 4/4 · payload: abstract only · 0 pii bytes", cls:"ok"},
+    {text:"leak-meter: 0 / 0 B · run_042 PASS", cls:"ok"},
+  ], 0);
+  var sihCycle = 0;
+  function sihStep(){
+    sihCycle++;
+    var el = $("sih-pii");
+    if(sihCycle % 6 === 3){
+      el.classList.add("redacted");
+      $("sih-rdx").textContent = 1 + Math.floor(sihCycle/6);
+      setTimeout(function(){ el.classList.remove("redacted"); el.style.display="none";
+        setTimeout(function(){ el.style.display=""; }, 2200); }, 1800);
+    }
+  }
+  setInterval(sihStep, 1400);
+
+  /* ---------- 4 · gurtai ---------- */
+  var gurtaiS = makeTerm($("term-gurtai"), [
+    {text:"llama3:8b-q4 · served · ctx 4096 · 42 tok/s", cls:"cy"},
+    {text:"prompt: 'summarize the gurtai repo' → 581 tokens"},
+    {text:"gen: 96 tokens · 2.1 s · temperature 0.3"},
+    {text:"api cost: $0.00 · queries today: 41 · cache hit 82%", cls:"ok"},
+    {text:"plugin: repo-summarizer → reply queued to telegram"},
+  ], 0);
+  var gurtaiPhase = 0;
+  function gurtaiStep(){
+    gurtaiPhase++;
+    var out = $("gurtai-out");
+    if(gurtaiPhase === 2){
+      out.innerHTML = '<span class="typing"><span></span><span></span><span></span></span>';
+      out.classList.add("typing");
+    }
+    if(gurtaiPhase === 4){
+      out.classList.remove("typing");
+      var full = "Gurtai = Python Telegram bot running local LLMs via Ollama. Plugin-based: each plugin adds a task (fetch, summarize, automate). Docker one-liner deploy. Zero per-query API cost.";
+      out.textContent = ""; var ci = 0;
+      var iv = setInterval(function(){ ci += 3; out.textContent = full.slice(0,ci); if(ci >= full.length) clearInterval(iv); }, 30);
+    }
+    if(gurtaiPhase === 8){
+      out.innerHTML = '<div class="msg user" style="margin-top:6px">is it really 0 cost?</div><div class="msg bot">Yep — inference runs on local GPU/CPU. Cost = electricity. API spend: $0.00.</div>';
+    }
+    if(gurtaiPhase > 14){ gurtaiPhase = 0; out.innerHTML = "Gurtai = Python Telegram bot running local LLMs via Ollama. Plugin-based: each plugin adds a task (fetch, summarize, automate). Docker one-liner deploy. Zero per-query API cost."; }
+  }
+  setInterval(gurtaiStep, 1500);
+
+  /* ---------- view gating + loops ---------- */
+  var view = {};
+  ["cv-quad","cv-swarm"].forEach(function(id){
+    var cv = $(id);
+    if(reduce){
+      // static frames
+      if(id==="cv-quad"){ drawQuad(0.8); } else {
+        subs[0]={x:0,y:0,tx:0,ty:0};
+        // place statically
+        var s=fit(swarm);
+        subs[0].x=s.w*0.3;subs[0].y=s.h*0.3;subs[0].tx=subs[0].x;subs[0].ty=subs[0].y;
+        subs[1].x=s.w*0.7;subs[1].y=s.h*0.35;subs[1].tx=subs[1].x;subs[1].ty=subs[1].y;
+        subs[2].x=s.w*0.35;subs[2].y=s.h*0.7;subs[2].tx=subs[2].x;subs[2].ty=subs[2].y;
+        subs[3].x=s.w*0.7;subs[3].y=s.h*0.65;subs[3].tx=subs[3].x;subs[3].ty=subs[3].y;
+        drawSwarm(1);
+      }
+      quadS.prime(); swarmS.prime(); sihS.prime(); gurtaiS.prime();
+      return;
+    }
+    new IntersectionObserver(function(entries){
+      view[id] = entries[0].isIntersecting;
+      if(view[id]){
+        if(id==="cv-quad"){ quadS.prime(); } else {
+          var s2=fit(swarm);
+          subs.forEach(function(sub,i){ var a=i*Math.PI/2+0.7; sub.x=sub.tx=s2.w/2+Math.cos(a)*80; sub.y=sub.ty=s2.h/2+Math.sin(a)*55; });
+        }
+      }
+    }, {threshold:0.1}).observe(cv.parentElement.closest(".demo"));
+  });
+  function loop(now){
+    var t = now/1000;
+    if(view["cv-quad"]){ drawQuad(t); quadS.step(); }
+    if(view["cv-swarm"]){ drawSwarm(t); swarmS.step(); }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  /* ---------- demo parallax (GSAP optional) ---------- */
+  if(window.gsap && window.ScrollTrigger){
+    gsap.utils.toArray(".demo").forEach(function(demo){
+      gsap.from(demo, { opacity:0, y:46, duration:0.9, ease:"power3.out",
+        scrollTrigger:{ trigger:demo, start:"top 82%" } });
+      var panel = demo.querySelector(".demo-panel");
+      gsap.from(panel, { opacity:0, scale:0.97, duration:1, ease:"power2.out",
+        scrollTrigger:{ trigger:demo, start:"top 80%" } });
+      gsap.to(demo.querySelector(".stage .glow"), {
+        backgroundPosition:"center 40%",
+        scrollTrigger:{ trigger:demo, start:"top bottom", end:"bottom top", scrub:true }
+      });
+    });
+    // subtle parallax on panel vs info
+    gsap.utils.toArray(".demo").forEach(function(demo){
+      gsap.to(demo.querySelector(".demo-info"), {
+        yPercent:-8, ease:"none",
+        scrollTrigger:{ trigger:demo, start:"top bottom", end:"bottom top", scrub:true }
+      });
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
