@@ -752,8 +752,8 @@ footer a:hover{text-decoration:underline}
     var hud=$("hud-swarm");
     if(hud) hud.innerHTML = "nodes <b>5</b> · rssi <b>-48 dBm</b> · drops <b>0</b><br>tasks <b>4/4</b> · sim <b>Gazebo headless</b>";
     // header text
-    ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace";
-    ctx.fillText("top-down · carrier swarm · task scoring live", 14, 22);
+    ctx.fillStyle="#56d8dd"; ctx.font="11px ui-monospace,monospace"; ctx.textAlign="right";
+    ctx.fillText("top-down · task scoring live", W-14, H-12); ctx.textAlign="left";
   }
 
   /* ================= 3 · SIH PII AGENT ================= */
