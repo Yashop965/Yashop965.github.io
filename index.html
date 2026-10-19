@@ -9,6 +9,7 @@
 <meta property="og:description" content="Open-source ESP32 quadruped, ROS2 swarm sim, local-LLM agents, SaaS end-to-end. Projects, CV and resume in one place.">
 <meta property="og:url" content="https://yashop965.github.io/">
 <meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231F4E79%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-family=%22Arial%22 font-size=%2220%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22%3EY%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#f6f8fb; --card:#ffffff; --ink:#17202b; --muted:#5b6675; --line:#e3e8ef;
@@ -431,8 +432,9 @@ footer a:hover{text-decoration:underline}
   });
   gsap.set("#progress", { transformOrigin: "left center" });
 
-  // hero entrance
-  gsap.from(".hero [data-anim]", { opacity: 0, y: 34, duration: 0.9, stagger: 0.12, ease: "power3.out" });
+  // hero entrance (animate the hero container, not the children - the parallax
+  // fromTo owns the child opacities, so both tweens must not fight)
+  gsap.from(".hero", { opacity: 0, y: 40, duration: 0.9, ease: "power3.out" });
 
   // section headings + strips
   gsap.utils.toArray("h2[data-anim], .strip").forEach(el => {
@@ -458,11 +460,13 @@ footer a:hover{text-decoration:underline}
       scrollTrigger: { trigger: box, start: "top 90%" } });
   });
 
-  // hero parallax fade on scroll
-  gsap.to(".hero h1, .hero .sub, .hero .cta, .hero .stat", {
-    opacity: 0.25, y: -60, ease: "none",
-    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom 20%", scrub: true }
-  });
+  // hero parallax fade on scroll (fromTo so scroll-0 state is fully visible;
+  // noScrollTrigger on the entrance side is not needed - scrub drives the value)
+  gsap.fromTo(".hero h1, .hero .sub, .hero .cta, .hero .stat",
+    { opacity: 1, y: 0 },
+    { opacity: 0.2, y: -50, ease: "none",
+      scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom 30%", scrub: true }
+    });
 })();
 </script>
 
@@ -710,10 +714,11 @@ footer a:hover{text-decoration:underline}
       var panel = demo.querySelector(".demo-panel");
       gsap.from(panel, { opacity:0, scale:0.97, duration:1, ease:"power2.out",
         scrollTrigger:{ trigger:demo, start:"top 80%" } });
-      gsap.to(demo.querySelector(".stage .glow"), {
-        backgroundPosition:"center 40%",
-        scrollTrigger:{ trigger:demo, start:"top bottom", end:"bottom top", scrub:true }
-      });
+      var glow = demo.querySelector(".stage .glow");
+      if(glow){
+        gsap.fromTo(glow, { opacity: 0.5 }, { opacity: 1,
+          scrollTrigger:{ trigger:demo, start:"top bottom", end:"bottom top", scrub:true } });
+      }
     });
     // subtle parallax on panel vs info
     gsap.utils.toArray(".demo").forEach(function(demo){
